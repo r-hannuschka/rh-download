@@ -12,7 +12,7 @@ export const DOWNLOAD_STATE_PROGRESS       :string;
 export const DOWNLOAD_STATE_QUEUED         :string;
 export const DOWNLOAD_STATE_START          :string;
 export const DOWNLOAD_STATE_UPDATE         :string;
-export const DOWNLOAD_TASK_MEDIA           :string;
+export const DOWNLOAD_TASK_FILE            :string;
 export const DOWNLOAD_TASK_YOUTUBE         :string;
 export const EVENT_DOWNLOAD_FINISHED       :string;
 export const EVENT_VIDEO_DOWNLOAD_FINISHED :string;
@@ -31,9 +31,9 @@ export class DownloadManager extends Observable<IDownloadTask>
 
     public cancelDownload(task: IDownloadTask);
 
-    public findTaskById(id: string): DownloadTask | null;
+    public findTaskById(id: string): IDownloadTask | null;
 
-    public getDownloads(groupName?: string): DownloadTask[];
+    public getDownloads(groupName?: string): IDownloadTask[];
 }
 
 export class DownloadTask extends Observable<IDownloadData> 
@@ -50,12 +50,14 @@ export class DownloadTask extends Observable<IDownloadData>
 export class TaskFactory
 {
     public static createYoutubeTask(data: IYoutubeFileData, group: string): IDownloadTask
+
+    public static createImageTask(data: IFileData, uri: string, group: string): IDownloadTask
 }
 
 /**
  * interfaces 
  */
-export interface IDownloadTask 
+export interface IDownloadTask extends Observable<IDownloadData>
 {
     getDownload(): IDownload;
 
@@ -107,10 +109,6 @@ export interface IDownloadData {
 }
 
 export interface IFileData {
-    description: string; 
-
-    image: string;
-
     name: string;
     
     type: string;
@@ -118,5 +116,9 @@ export interface IFileData {
 
 export interface IYoutubeFileData extends IFileData
 {
+    description: string; 
+
+    imageUri: string;
+
     video_id: string;
 }
