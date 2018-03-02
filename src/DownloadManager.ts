@@ -10,11 +10,11 @@ import {
     DOWNLOAD_STATE_START,
     DOWNLOAD_STATE_PROGRESS,
     IDownload,
-    IDownloadData,
+    IDownloadTask,
     IMessage,
 } from "./api";
 
-export class DownloadManager extends Observable<IDownloadData> {
+export class DownloadManager extends Observable<IDownloadTask> {
 
     private taskQueue: any;
 
@@ -25,7 +25,7 @@ export class DownloadManager extends Observable<IDownloadData> {
      * @type {Set<DownloadTask>}
      * @memberof DownloadManager
      */
-    private downloadTasks: Set<DownloadTask>;
+    private downloadTasks: Set<IDownloadTask>;
 
     /**
      * all running download tasks 
@@ -34,7 +34,7 @@ export class DownloadManager extends Observable<IDownloadData> {
      * @type {WeakMap<DownloadTask, ChildProcess>}
      * @memberof DownloadManager
      */
-    private processes: WeakMap<DownloadTask, ChildProcess>
+    private processes: WeakMap<IDownloadTask, ChildProcess>
 
     /**
      * Log Service
@@ -87,8 +87,8 @@ export class DownloadManager extends Observable<IDownloadData> {
      * @param {boolean} [autostart=true] 
      * @memberof DownloadManager
      */
-    public registerDownload(task: DownloadTask, autostart = true)  {
-
+    public registerDownload(task: IDownloadTask, autostart = true)
+    {
         task.setTaskId(Math.random().toString(32).substr(2));
         this.downloadTasks.add(task);
 
@@ -108,8 +108,8 @@ export class DownloadManager extends Observable<IDownloadData> {
      * @param {DownloadTask} task 
      * @memberof DownloadManager
      */
-    public startDownload(task: DownloadTask) {
-
+    public startDownload(task: IDownloadTask)
+    {
         this.logService.log(
             `add download to queue: ${task.getDownload().getName()}`,
             Log.LOG_DEBUG
@@ -123,7 +123,7 @@ export class DownloadManager extends Observable<IDownloadData> {
      * 
      * @param <DownloadTask> task
      */
-    public cancelDownload(task: DownloadTask) {
+    public cancelDownload(task: IDownloadTask) {
 
         if ( ! task ) {
             return;
@@ -148,7 +148,8 @@ export class DownloadManager extends Observable<IDownloadData> {
      * 
      * @param id 
      */
-    public findTaskById(id: string): DownloadTask | null {
+    public findTaskById(id: string): DownloadTask | null
+    {
         let task: DownloadTask | null = null;
         this.downloadTasks.forEach( (t: DownloadTask) => {
             if ( t.getTaskId() === id ) {
@@ -163,7 +164,8 @@ export class DownloadManager extends Observable<IDownloadData> {
      *
      * @param {String} groupname
      */
-    public getDownloads(groupName?: string): DownloadTask[] {
+    public getDownloads(groupName?: string): IDownloadTask[]
+    {
 
         let currentTasks = Array.from(this.downloadTasks.values());
 
@@ -185,7 +187,7 @@ export class DownloadManager extends Observable<IDownloadData> {
      * @param {any} [data=null] 
      * @memberof DownloadManager
      */
-    private updateTask(task: DownloadTask, state: string, data = null): void {
+    private updateTask(task: IDownloadTask, state: string, data = null): void {
 
         if (state === DOWNLOAD_STATE_CANCEL ||
             state === DOWNLOAD_STATE_ERROR ||
@@ -206,7 +208,7 @@ export class DownloadManager extends Observable<IDownloadData> {
         download.setError(data.error);
 
         task.update();
-        this.publish(task.toJSON(), task.getGroupName());
+        this.publish(task, task.getGroupName());
     }
 
     /**

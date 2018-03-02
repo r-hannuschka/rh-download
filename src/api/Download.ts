@@ -1,3 +1,5 @@
+import { IFileData } from './index';
+
 /**
  * Download Data
  */
@@ -66,4 +68,12 @@ export interface IDownload {
      * @memberof IDownload
      */
     getState(): string;
+
+    /**
+     * 
+     * 
+     * @returns {IFileData} 
+     * @memberof IDownload
+     */
+    getRaw(): IFileData;
 }

@@ -1,8 +1,9 @@
 import { Observable } from "rh-utils";
-import { IDownload, IDownloadData } from "../api";
+import { IDownload, IDownloadData, IDownloadTask} from "../api";
 import { Download } from "./Download";
 
 export class DownloadTask extends Observable<IDownloadData>
+    implements IDownloadTask
 {
     private download: Download;
 

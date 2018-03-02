@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES6",
     "module": "commonjs",
-    "outDir": "./dist",
+    "outDir": "./lib",
     "rootDir": "./src",
     "removeComments": false,                 
     "noUnusedLocals": true,                
@@ -10,7 +10,7 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": false, 
     "moduleResolution": "node",
-    "sourceMap": true,
+    "sourceMap": false,
     "typeRoots": [
       "./node_modules/@types"
     ]

@@ -1,4 +1,4 @@
-import {IDownload} from '../api';
+import {IDownload, IFileData} from '../api';
 
 export class Download implements IDownload {
 
@@ -18,12 +18,18 @@ export class Download implements IDownload {
 
     private state: string;
 
+    private raw: IFileData ;
+
     public getDestination() {
         return this.destination;
     }
 
     public getError(): string {
         return this.error;
+    }
+
+    public getFileName(): string {
+        return this.fileName;
     }
 
     public getLoaded(): number {
@@ -34,8 +40,8 @@ export class Download implements IDownload {
         return this.name;
     }
 
-    public getFileName(): string {
-        return this.fileName;
+    public getRaw(): IFileData {
+        return this.raw;
     }
 
     public getSize(): number {
@@ -54,12 +60,12 @@ export class Download implements IDownload {
         this.destination = dest;
     }
 
-    public setFileName(name: string) {
-        this.fileName = name;
-    }
-
     public setError(error: string) {
         this.error = error;
+    }
+
+    public setFileName(name: string) {
+        this.fileName = name;
     }
 
     public setLoaded(loaded: number) {
@@ -68,6 +74,10 @@ export class Download implements IDownload {
 
     public setName(name: string) {
         this.name = name;
+    }
+
+    public setRaw(data: IFileData) {
+        this.raw = data;
     }
 
     public setSize(size: number) {
