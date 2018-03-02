@@ -1,0 +1,27 @@
+{
+  "name": "rh-download",
+  "version": "0.0.1",
+  "description": "handle downloads",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "youtube",
+    "file",
+    "downloads"
+  ],
+  "author": "Ralf Hannuschka",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^2.6.0",
+    "request": "^2.83.0",
+    "rh-utils": "file:../rh-utils",
+    "ytdl-core": "^0.20.2"
+  },
+  "devDependencies": {
+    "@types/node": "^9.4.6",
+    "typescript": "^2.7.2"
+  }
+}
