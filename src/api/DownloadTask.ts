@@ -1,6 +1,7 @@
 import {IDownload, IDownloadData} from './index';
+import { IObservable } from 'rh-utils';
 
-export interface IDownloadTask
+export interface IDownloadTask extends IObservable
 {
     getDownload(): IDownload;
 

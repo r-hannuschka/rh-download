@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "handle downloads",
   "main": "lib/index.js",
-  "types": "lib/main.d.ts",
+  "typings": "typings/main.d.ts",
   "scripts": {
     "build": "tsc"
   },
