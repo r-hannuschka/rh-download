@@ -89,6 +89,7 @@ export class DownloadTask extends Observable<IDownloadData>
             loaded: download.getLoaded(),
             name  : download.getName(),
             id    : this.getTaskId(),
+            file  : `${download.getDestination()}/${download.getFileName()}`,
             size  : download.getSize()
         };
     }

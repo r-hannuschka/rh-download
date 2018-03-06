@@ -6,6 +6,7 @@ import {
     DOWNLOAD_STATE_CANCEL,
     DOWNLOAD_STATE_END,
     DOWNLOAD_STATE_ERROR,
+    DOWNLOAD_STATE_INITIALIZED,
     DOWNLOAD_STATE_QUEUED,
     DOWNLOAD_STATE_START,
     DOWNLOAD_STATE_PROGRESS,
@@ -189,6 +190,8 @@ export class DownloadManager extends Observable<IDownloadTask> {
      */
     private updateTask(task: IDownloadTask, state: string, data = null): void {
 
+        const download: Download = task.getDownload() as Download;
+
         if (state === DOWNLOAD_STATE_CANCEL ||
             state === DOWNLOAD_STATE_ERROR ||
             state === DOWNLOAD_STATE_END) {
@@ -199,9 +202,12 @@ export class DownloadManager extends Observable<IDownloadTask> {
             this.removeDownload(task);
         }
 
+        if ( state === DOWNLOAD_STATE_INITIALIZED ) {
+            download.setFileName(data.file.match(/[^\/]+$/)[0] || download.getFileName());
+        }
+
         data = data || { loaded: 0, size: 0, error: '' };
 
-        const download: Download = task.getDownload() as Download;
         download.setState(state);
         download.setLoaded(data.loaded);
         download.setSize(data.size);
@@ -253,8 +259,12 @@ export class DownloadManager extends Observable<IDownloadTask> {
             this.onDownloadTaskMessage(response, task);
         });
 
-        childProcess.stderr.on('data', (data) => {
+        childProcess.stdout.on('data', (data) => {
             console.log ( data.toString() );
+        });
+
+        childProcess.stderr.on('data', (data) => {
+            this.logService.log(data.toString(), Log.LOG_ERROR);
         });
 
         childProcess.once("exit", () => {
@@ -264,8 +274,7 @@ export class DownloadManager extends Observable<IDownloadTask> {
 
         // send message to child process
         childProcess.send("start");
-
-        this.updateTask(task, DOWNLOAD_STATE_START );
+        this.updateTask(task, DOWNLOAD_STATE_START);
     }
 
     /**
@@ -279,7 +288,8 @@ export class DownloadManager extends Observable<IDownloadTask> {
         const data = {
             error : response.error,
             loaded: response.data.loaded || 0,
-            size  : response.data.total  || 0
+            size  : response.data.total  || 0,
+            file  : response.data.file
         };
 
         if ( response.state !== DOWNLOAD_STATE_PROGRESS ) {

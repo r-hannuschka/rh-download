@@ -1,10 +1,10 @@
-import * as fs from "fs";
 import { IncomingHttpHeaders, IncomingMessage } from "http";
+import * as fs from 'fs';
 import {
     DOWNLOAD_STATE_END,
-    DOWNLOAD_STATE_START,
     DOWNLOAD_STATE_ERROR,
-    DOWNLOAD_STATE_CANCEL
+    DOWNLOAD_STATE_CANCEL,
+    DOWNLOAD_STATE_INITIALIZED
 } from "../api";
 import { FileExistsException } from '../model/exception/FileExists';
 import { DirectoryNotExistsException } from '../model/exception/DirectoryNotExsists';
@@ -22,6 +22,8 @@ export abstract class DownloadTask
     protected loaded: number = 0;
 
     protected uri: string;
+
+    private target: fs.PathLike;
 
     public constructor() 
     {
@@ -43,7 +45,6 @@ export abstract class DownloadTask
         try {
             this.loadProcessParameters();
             this.validateDirectory();
-            this.validateFile(`${this.directory}/${this.fileName}`);
             this.startDownload();
         } catch(exception) {
             if ( exception instanceof FileExistsException ) {
@@ -55,6 +56,13 @@ export abstract class DownloadTask
     }
 
     protected abstract startDownload(): void;
+
+    protected createFileStream(headers: IncomingHttpHeaders)
+    {
+        const type = headers['content-type'].split('/');
+        this.target = `${this.directory}/${this.fileName}.${type[1]}`;
+        this.fileStream = fs.createWriteStream(this.target, {flags: 'wx' });
+    }
 
     /**
      * parse process arguments
@@ -81,7 +89,7 @@ export abstract class DownloadTask
     }
 
     /**
-     * video response has been found and start downloading
+     * video response has been found and download started
      *
      * @param {IncomingMessage} response
      */
@@ -89,9 +97,9 @@ export abstract class DownloadTask
     {
         const headers: IncomingHttpHeaders = response.headers;
         const total: number = parseInt(headers["content-length"] as string, 10);
-
         this.total = total;
-        this.updateDownload('Download starting', DOWNLOAD_STATE_START);
+        this.createFileStream(headers);
+        this.updateDownload('download initialized', DOWNLOAD_STATE_INITIALIZED);
     }
 
     /**
@@ -106,8 +114,8 @@ export abstract class DownloadTask
         this.fileStream = null;
 
         // remove file 
-        if (fs.existsSync(`${this.directory}/${this.fileName}`)) {
-            fs.unlinkSync(`${this.directory}/${this.fileName}`);
+        if (fs.existsSync(this.target)) {
+            fs.unlinkSync(this.target);
         }
         this.finishDownload('Download Cancled', DOWNLOAD_STATE_CANCEL);
     }
@@ -139,7 +147,7 @@ export abstract class DownloadTask
         process.send({
             data: {
                 message,
-                file: `${this.directory}/${this.fileName}`,
+                file: this.target,
                 loaded: this.loaded,
                 total: this.total
             },
@@ -162,13 +170,6 @@ export abstract class DownloadTask
             }
         } else {
             fs.mkdirSync(this.directory);
-        }
-    }
-
-    private validateFile(path: string)
-    {
-        if ( fs.existsSync(path) ) {
-            throw new FileExistsException(`file allready exists: ${this.fileName}`);
         }
     }
 }

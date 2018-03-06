@@ -1,21 +1,22 @@
-import * as fs from "fs";
 import * as request from "request";
 import { DownloadTask } from './download';
-import { DOWNLOAD_STATE_END, DOWNLOAD_STATE_PROGRESS } from "../api";
+import { DOWNLOAD_STATE_PROGRESS, DOWNLOAD_STATE_END } from "../api";
+import { IncomingMessage } from "http";
 
 class FileDownload extends DownloadTask {
 
     protected startDownload(): void {
-        this.fileStream = fs.createWriteStream(`${this.directory}/${this.fileName}`);
         const req = request(this.uri);
-        req.on("response", this.readResponse.bind(this))
+        req.on("response", (message: IncomingMessage) => {
+                this.readResponse(message);
+                req.pipe(this.fileStream)
+                    .on('close', () => {
+                        this.finishDownload("download success", DOWNLOAD_STATE_END);
+                    })
+            })
             .on("data", (chunk: Buffer) => {
                 this.loaded = this.loaded + chunk.byteLength;
                 this.updateDownload("download progressing ...", DOWNLOAD_STATE_PROGRESS);
-            })
-            .pipe(this.fileStream)
-            .on("close", () => {
-                this.updateDownload("download finished", DOWNLOAD_STATE_END);
             });
     }
 }

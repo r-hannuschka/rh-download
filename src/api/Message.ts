@@ -1,9 +1,10 @@
 export interface IMessage {
-    state: string,
     data?: {
         loaded: number,
-        total: number
+        total : number,
+        file  : string
     },
     error?: string,
-    processId: string
+    processId: string,
+    state: string
 };

@@ -10,6 +10,8 @@ export interface IDownloadData {
 
     id: string;
 
+    file: string;
+
     size: number;
 
     state: string;

@@ -1,10 +1,10 @@
-import * as fs from "fs";
 import * as ytdl from "ytdl-core";
 import {
     DOWNLOAD_STATE_END,
     DOWNLOAD_STATE_PROGRESS,
 } from "../api";
 import { DownloadTask } from './download';
+import { IncomingMessage } from "http";
 
 class YoutubeDownloadTask extends DownloadTask
 {
@@ -18,29 +18,18 @@ class YoutubeDownloadTask extends DownloadTask
 
     protected startDownload()
     {
-        this.processDownload();
-    }
-
-    /**
-     * processing download
-     */
-    private async processDownload() {
-
-        await ytdl.getInfo(this.uri);
-
-        // create file for download
-        this.fileStream = fs.createWriteStream(`${this.directory}/${this.fileName}`, {flags: 'wx' });
-
         // create youtube download stream
-        const stream = ytdl(this.uri);
-        stream.on("response", this.readResponse.bind(this));
-        stream.on("progress", this.onProgress.bind(this));
-        stream.on("end"     , () => {
-            stream.removeAllListeners();
-            this.finishDownload('Download finished', DOWNLOAD_STATE_END);
-        });
-        stream.pipe(this.fileStream);
-        this.ytdlStream = stream;
+        this.ytdlStream = ytdl(this.uri);
+        this.ytdlStream
+            .on("response", (message: IncomingMessage) => {
+                this.readResponse(message);
+                this.ytdlStream.pipe(this.fileStream);
+            })
+            .on("progress", this.onProgress.bind(this))
+            .on("end"     , () => {
+                this.ytdlStream.removeAllListeners();
+                this.finishDownload('Download finished', DOWNLOAD_STATE_END);
+            });
     }
 
     /**
