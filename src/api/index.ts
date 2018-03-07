@@ -8,6 +8,8 @@ export * from "./Message";
 export * from "./YoutubeFileData";
 
 export const DOWNLOAD_GROUP_YOUTUBE      = 'youtube.download';
+export const DOWNLOAD_ACTION_CANCEL      = "cancel";
+export const DOWNLOAD_ACTION_DESTROY     = "destroy";
 export const DOWNLOAD_STATE_CANCEL       = "cancel";
 export const DOWNLOAD_STATE_END          = "end";
 export const DOWNLOAD_STATE_ERROR        = "error";

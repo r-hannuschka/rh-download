@@ -13,6 +13,7 @@ import {
     IDownload,
     IDownloadTask,
     IMessage,
+    DOWNLOAD_ACTION_CANCEL,
 } from "./api";
 
 export class DownloadManager extends Observable<IDownloadTask> {
@@ -139,9 +140,12 @@ export class DownloadManager extends Observable<IDownloadTask> {
                 }
                 return true;
             });
+
+            this.updateTask(task, DOWNLOAD_STATE_CANCEL, {});
+            return;
         };
 
-        this.processes.get(task).send('cancel');
+        this.processes.get(task).send(DOWNLOAD_ACTION_CANCEL);
     }
 
     /**
@@ -211,7 +215,11 @@ export class DownloadManager extends Observable<IDownloadTask> {
         download.setState(state);
         download.setLoaded(data.loaded);
         download.setSize(data.size);
-        download.setError(data.error);
+
+        if ( data.hasError ) {
+            download.setError(data.error.message);
+            this.logService.log(data.error.message, );
+        }
 
         task.update();
         this.publish(task, task.getGroupName());
@@ -242,38 +250,29 @@ export class DownloadManager extends Observable<IDownloadTask> {
     private runTask(task: DownloadTask, done) {
 
         const download: IDownload = task.getDownload();
-
-        const name = Sanitize.sanitizeFileName(
-            download.getName());
-
+        const name = Sanitize.sanitizeFileName(download.getName());
         const params = [
             "--dir" , download.getDestination(),
             "--name", name,
             "--uri" , download.getUri()
         ];
 
-        const childProcess = this.createChildProcess(task.getTaskFile(), params);
+        let childProcess = null;
+
+        childProcess = this.createChildProcess(task.getTaskFile(), params);
         this.processes.set(task, childProcess);
 
         childProcess.on("message",  (response: IMessage) => {
             this.onDownloadTaskMessage(response, task);
-        });
-
-        childProcess.stdout.on('data', (data) => {
-            console.log ( data.toString() );
-        });
-
-        childProcess.stderr.on('data', (data) => {
-            this.logService.log(data.toString(), Log.LOG_ERROR);
-        });
-
-        childProcess.once("exit", () => {
+        })
+        .once("exit", () => {
             childProcess.removeAllListeners();
             done();
         });
 
         // send message to child process
         childProcess.send("start");
+
         this.updateTask(task, DOWNLOAD_STATE_START);
     }
 
@@ -309,7 +308,7 @@ export class DownloadManager extends Observable<IDownloadTask> {
                     "pipe",
                     "pipe",
                     "ipc"
-                ],
+                ]
             }
         );
         return childProcess;

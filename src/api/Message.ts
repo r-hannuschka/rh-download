@@ -1,10 +1,20 @@
+export interface ITextMessage
+{
+    type: 'error' | 'notice' | 'warning';
+
+    text: string;
+}
+
 export interface IMessage {
-    data?: {
+    data: {
         loaded: number,
         total : number,
         file  : string
     },
-    error?: string,
-    processId: string,
+    error?: {
+        message: string
+    },
+    hasError: boolean,
+    messages: ITextMessage[]
     state: string
 };
