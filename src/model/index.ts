@@ -1,3 +1,3 @@
-export * from './Download';
-export * from './DownloadTask';
-export * from './TaskFactory';
+export * from "./File";
+export * from "./Task";
+export * from "./YoutubeFile";

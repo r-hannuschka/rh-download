@@ -1,25 +1,16 @@
-import { 
-    DOWNLOAD_STATE_CANCEL,
-    DOWNLOAD_STATE_END,
-    DOWNLOAD_STATE_ERROR,
-    DownloadManager,
-    IDownloadData,
-    IDownloadTask,
-    IFileData,
-    TaskFactory
-} from '../index';
-
+import { DOWNLOAD_STATE_CANCEL, DOWNLOAD_STATE_END, DOWNLOAD_STATE_ERROR, DownloadManager, IFileData, ITask, ITaskData } from '../index';
+import { TaskFactory } from '../provider/TaskFactory';
 import { ISubscription } from 'rh-utils';
 
-export async function downloadImageFile(name: string, uri: string): Promise<IDownloadData>
+export async function downloadImageFile(name: string, uri: string): Promise<IFileData>
 {
-    return new Promise<IDownloadData>( (resolve, reject) => {
+    return new Promise<IFileData>( (resolve, reject) => {
 
         const downloadManager = DownloadManager.getInstance();
-        const data: IFileData = { name, type: 'image' };
-        const task: IDownloadTask  = TaskFactory.createImageTask(data, uri);
+        const data: IFileData = { title: name, type: 'image' };
+        const task: ITask     = TaskFactory.getImageTaskFactory().createImageTask(data, uri);
 
-        const sub: ISubscription = task.subscribe( (data: IDownloadData) => {
+        const sub: ISubscription = task.subscribe( (data: ITaskData) => {
 
             if ( data.state === DOWNLOAD_STATE_CANCEL || data.state === DOWNLOAD_STATE_ERROR ) {
                 sub.unsubscribe();
@@ -28,7 +19,7 @@ export async function downloadImageFile(name: string, uri: string): Promise<IDow
 
             if ( data.state === DOWNLOAD_STATE_END ) {
                 sub.unsubscribe();
-                resolve(data);
+                resolve(data.file);
             }
         });
 

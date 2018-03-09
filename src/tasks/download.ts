@@ -8,6 +8,7 @@ import {
     DOWNLOAD_STATE_INITIALIZED,
     DOWNLOAD_STATE_END,
     DOWNLOAD_STATE_PROGRESS,
+    IMessage,
 } from "../api";
 import { DirectoryNotExistsException } from '../model/exception/DirectoryNotExsists';
 
@@ -92,20 +93,20 @@ export abstract class DownloadTask
         if ( fs.existsSync(file) ) {
             const data = {
                 hasError: true,
-                messages: [{
+                message: {
                     type: 'notice',
                     text: format('Download aborted: File %s allready exists.', file)
-                }],
+                },
                 state: DOWNLOAD_STATE_END
             };
-
             this.update(data);
             return null;
         }
 
-        this.target = file;
-        this.total  = total;
+        this.fileName   = `${this.fileName}.${type[1]}`;
         this.fileStream = fs.createWriteStream(file, {flags: 'wx' });
+        this.target     = file;
+        this.total      = total;
 
         this.update({state: DOWNLOAD_STATE_INITIALIZED});
         return this.fileStream
@@ -149,7 +150,7 @@ export abstract class DownloadTask
      * @param {any} state 
      * @memberof DownloadTask
      */
-    protected update(data = {}): void
+    protected update(data: IMessage): void
     {
         process.send(Object.assign({
             data: {

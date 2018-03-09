@@ -1,4 +1,4 @@
-import { IFileData } from './index'
+import { IFileData } from './FileData';
 
 export interface IYoutubeFileData extends IFileData
 {

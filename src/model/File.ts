@@ -1,6 +1,6 @@
-import {IDownload, IFileData} from '../api';
+import {IFile, IFileData} from '../api';
 
-export class Download implements IDownload {
+export class File implements IFile {
 
     private uri: string;
 
@@ -16,9 +16,7 @@ export class Download implements IDownload {
 
     private fileName: string;
 
-    private state: string;
-
-    private raw: IFileData ;
+    private type: string;
 
     public getDestination() {
         return this.destination;
@@ -32,6 +30,10 @@ export class Download implements IDownload {
         return this.fileName;
     }
 
+    public getType(): string {
+        return this.type;
+    }
+
     public getLoaded(): number {
         return this.loaded;
     }
@@ -40,16 +42,8 @@ export class Download implements IDownload {
         return this.name;
     }
 
-    public getRaw(): IFileData {
-        return this.raw;
-    }
-
     public getSize(): number {
         return this.size;
-    }
-
-    public getState(): string {
-        return this.state;
     }
 
     public getUri(): string {
@@ -76,19 +70,27 @@ export class Download implements IDownload {
         this.name = name;
     }
 
-    public setRaw(data: IFileData) {
-        this.raw = data;
-    }
-
     public setSize(size: number) {
         this.size = size;
     }
 
-    public setState(state: string) {
-        this.state = state;
+    public setType(type: string) {
+        this.type = type;
     }
 
     public setUri(uri: string) {
         this.uri = uri;
+    }
+
+    public raw(): IFileData 
+    {
+        return {
+            fileName: this.getFileName(),
+            loaded: this.getLoaded(),
+            path: this.getDestination(),
+            size: this.getSize(),
+            title: this.getName(),
+            type: this.getType()
+        }
     }
 }

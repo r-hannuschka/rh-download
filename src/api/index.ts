@@ -1,11 +1,12 @@
 import * as path from "path";
 
-export * from "./Download";
-export * from "./DownloadData";
-export * from "./DownloadTask";
-export * from "./FileData";
+export * from "./Task";
 export * from "./Message";
-export * from "./YoutubeFileData";
+export * from "./TaskData";
+export * from "./file/File";
+export * from "./file/FileData";
+export * from "./file/YoutubeFile";
+export * from "./file/YoutubeFileData";
 
 export const DOWNLOAD_GROUP_YOUTUBE      = 'youtube.download';
 export const DOWNLOAD_ACTION_CANCEL      = "cancel";

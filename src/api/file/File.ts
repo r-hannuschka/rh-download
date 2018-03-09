@@ -1,9 +1,9 @@
-import { IFileData } from './index';
+import { IFileData } from "./FileData";
 
 /**
  * Download Data
  */
-export interface IDownload {
+export interface IFile {
 
     /**
      *
@@ -62,12 +62,12 @@ export interface IDownload {
     getDestination(): string;
 
     /**
-     * returns current download status
+     * returns type of file
      * 
      * @returns {string} 
      * @memberof IDownload
      */
-    getState(): string;
+    getType(): string;
 
     /**
      * 
@@ -75,5 +75,5 @@ export interface IDownload {
      * @returns {IFileData} 
      * @memberof IDownload
      */
-    getRaw(): IFileData;
+    raw(): IFileData;
 }
