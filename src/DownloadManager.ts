@@ -151,7 +151,7 @@ export class DownloadManager extends Observable<ITask> {
      * 
      * @param id 
      */
-    public findTaskById(id: string): Task | null
+    public findTaskById(id: string): ITask | null
     {
         let task: Task | null = null;
         this.downloadTasks.forEach( (t: Task) => {
@@ -167,9 +167,8 @@ export class DownloadManager extends Observable<ITask> {
      *
      * @param {String} groupname
      */
-    public getFiles(groupName?: string): ITask[]
+    public getTasks(groupName?: string): ITask[]
     {
-
         let currentTasks = Array.from(this.downloadTasks.values());
 
         if (groupName && groupName.replace(/^\s*(.*?)\s*$/, "$1").length) {
@@ -253,7 +252,7 @@ export class DownloadManager extends Observable<ITask> {
         const params = [
             "--dir" , download.getDestination(),
             "--name", name,
-            "--uri" , download.getUri()
+            "--uri" , task.getUri()
         ];
 
         let childProcess = null;
@@ -310,6 +309,11 @@ export class DownloadManager extends Observable<ITask> {
                 ]
             }
         );
+
+        childProcess.stderr.on('data', (err) => {
+            this.logService.log(err.toString(), Log.LOG_ERROR);
+        });
+
         return childProcess;
     }
 }

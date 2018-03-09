@@ -1,6 +1,6 @@
 import {Task, YoutubeFile } from '../model';
-import { DOWNLOAD_TASK_YOUTUBE, IYoutubeFile, IYoutubeFileData, YOUTUBE_BASE_URI } from '../api';
-import { Config } from 'rh-utils';
+import { DOWNLOAD_TASK_YOUTUBE, IYoutubeFile, YOUTUBE_BASE_URI, IYoutubeData } from '../api';
+import { Config, Sanitize } from 'rh-utils';
 
 export class YoutubeTaskFactory {
 
@@ -19,9 +19,9 @@ export class YoutubeTaskFactory {
      * @returns {DownloadTask} 
      * @memberof TaskFactory
      */
-    public createTask(data: IYoutubeFileData, group = 'global'): Task
+    public createTask(data: IYoutubeData, group = 'global'): Task
     {
-        const downloadFile   = this.createFile();
+        const downloadFile = this.createFile(data);
 
         // create task
         const task = new Task();
@@ -33,11 +33,14 @@ export class YoutubeTaskFactory {
         return task;
     }
 
-    private createFile(): IYoutubeFile
+    private createFile(data: IYoutubeData): IYoutubeFile
     {
         const file: YoutubeFile = new YoutubeFile();
         file.setDestination(this.configProvider.get('download.youtube.dir'));
-        file.setType("video");
+        file.setFileName( Sanitize.sanitizeFileName(data.name) );
+        file.setImage(data.imageUri);
+        file.setName(data.name);
+        file.setVideoId(data.video_id);
 
         return file;
     }

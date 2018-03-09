@@ -82,7 +82,7 @@ export class File implements IFile {
         this.uri = uri;
     }
 
-    public raw(): IFileData 
+    public raw(): IFileData
     {
         return {
             fileName: this.getFileName(),

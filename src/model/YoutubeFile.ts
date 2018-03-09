@@ -36,9 +36,9 @@ export class YoutubeFile extends File implements IYoutubeFile {
     public raw(): IYoutubeFileData 
     {
         return Object.assign(super.raw(), {
-            description: "",
-            imageUri: "",
-            video_id: ""
+            description: this.getDescription(),
+            imageUri: this.getImage(),
+            video_id: this.getVideoId()
         });
     }
 }

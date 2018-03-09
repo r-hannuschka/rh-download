@@ -1,5 +1,5 @@
-import { IFile } from './File';
-import { IYoutubeFileData } from './YoutubeFileData';
+import { IFile } from "./File";
+import { IYoutubeFileData } from "./YoutubeFileData";
 
 export interface IYoutubeFile extends IFile {
 

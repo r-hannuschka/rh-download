@@ -4,23 +4,10 @@ import { Config, Sanitize } from 'rh-utils';
 
 export class ImageTaskFactory
 {
-
     private configProvider: Config;
 
     public constructor() {
         this.configProvider = Config.getInstance();
-    }
-
-    private createFile(data: IFileData): IFile
-    {
-        const file: File = new File();
-
-        file.setName(data.title);
-        file.setType("image");
-        file.setDestination(data.path  || this.configProvider.get('download.image.dir'));
-        file.setFileName(data.fileName || Sanitize.sanitizeFileName(data.title) );
-
-        return file;
     }
 
     /**
@@ -33,7 +20,7 @@ export class ImageTaskFactory
      * @returns {DownloadTask} 
      * @memberof TaskFactory
      */
-    public createImageTask(data: IFileData, uri: string, group = 'global'): Task
+    public createTask(data: IFileData, uri: string, group = 'global'): Task
     {
         // create download
         const downloadFile = this.createFile(data);
@@ -46,5 +33,17 @@ export class ImageTaskFactory
         task.setUri(uri);
 
         return task;
+    }
+
+    private createFile(data: IFileData): IFile
+    {
+        const file: File = new File();
+
+        file.setName(data.title);
+        file.setType("image");
+        file.setDestination(data.path  || this.configProvider.get('download.image.dir'));
+        file.setFileName(data.fileName || Sanitize.sanitizeFileName(data.title) );
+
+        return file;
     }
 }

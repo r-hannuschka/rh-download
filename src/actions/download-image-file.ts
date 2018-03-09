@@ -8,7 +8,7 @@ export async function downloadImageFile(name: string, uri: string): Promise<IFil
 
         const downloadManager = DownloadManager.getInstance();
         const data: IFileData = { title: name, type: 'image' };
-        const task: ITask     = TaskFactory.getImageTaskFactory().createImageTask(data, uri);
+        const task: ITask     = TaskFactory.getImageTaskFactory().createTask(data, uri);
 
         const sub: ISubscription = task.subscribe( (data: ITaskData) => {
 

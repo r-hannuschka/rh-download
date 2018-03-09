@@ -3,6 +3,7 @@ import * as path from "path";
 export * from "./Task";
 export * from "./Message";
 export * from "./TaskData";
+export * from "./YoutubeData";
 export * from "./file/File";
 export * from "./file/FileData";
 export * from "./file/YoutubeFile";
