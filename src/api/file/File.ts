@@ -62,14 +62,6 @@ export interface IFile {
     getDestination(): string;
 
     /**
-     * returns type of file
-     * 
-     * @returns {string} 
-     * @memberof IDownload
-     */
-    getType(): string;
-
-    /**
      * 
      * 
      * @returns {IFileData} 

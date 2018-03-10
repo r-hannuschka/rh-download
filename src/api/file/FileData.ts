@@ -1,12 +1,10 @@
 export interface IFileData {
 
-    title: string;
+    name: string;
 
     fileName?: string;
 
     path?: string;
-
-    type: string;
 
     size?: number;
 

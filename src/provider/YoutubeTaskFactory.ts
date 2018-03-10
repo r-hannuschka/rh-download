@@ -21,11 +21,11 @@ export class YoutubeTaskFactory {
      */
     public createTask(data: IYoutubeData, group = 'global'): Task
     {
-        const downloadFile = this.createFile(data);
+        const file: IYoutubeFile = this.createFile(data);
 
         // create task
         const task = new Task();
-        task.setFile(downloadFile)
+        task.setFile(file)
         task.setGroupName(group);
         task.setTaskFile(DOWNLOAD_TASK_YOUTUBE);
         task.setUri(YOUTUBE_BASE_URI + data.video_id);

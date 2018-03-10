@@ -16,8 +16,6 @@ export class File implements IFile {
 
     private fileName: string;
 
-    private type: string;
-
     public getDestination() {
         return this.destination;
     }
@@ -28,10 +26,6 @@ export class File implements IFile {
 
     public getFileName(): string {
         return this.fileName;
-    }
-
-    public getType(): string {
-        return this.type;
     }
 
     public getLoaded(): number {
@@ -50,6 +44,12 @@ export class File implements IFile {
         return this.uri;
     }
 
+    /**
+     * set file destination path
+     * 
+     * @param {string} dest 
+     * @memberof File
+     */
     public setDestination( dest: string) {
         this.destination = dest;
     }
@@ -74,10 +74,6 @@ export class File implements IFile {
         this.size = size;
     }
 
-    public setType(type: string) {
-        this.type = type;
-    }
-
     public setUri(uri: string) {
         this.uri = uri;
     }
@@ -89,8 +85,7 @@ export class File implements IFile {
             loaded: this.getLoaded(),
             path: this.getDestination(),
             size: this.getSize(),
-            title: this.getName(),
-            type: this.getType()
+            name: this.getName()
         }
     }
 }
