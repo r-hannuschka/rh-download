@@ -21,7 +21,7 @@
     "ytdl-core": "^0.20.2"
   },
   "devDependencies": {
-    "@types/node": "^9.4.6",
+    "@types/node": "^9.4.7",
     "typescript": "^2.7.2"
   }
 }

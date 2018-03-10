@@ -150,7 +150,7 @@ export abstract class DownloadTask
      * @param {any} state 
      * @memberof DownloadTask
      */
-    protected update(data: IMessage): void
+    protected update(response: IMessage): void
     {
         process.send(Object.assign({
             data: {
@@ -160,7 +160,7 @@ export abstract class DownloadTask
             },
             hasError: false,
             state: DOWNLOAD_STATE_PROGRESS
-        }, data));
+        }, response));
     }
 
     /**

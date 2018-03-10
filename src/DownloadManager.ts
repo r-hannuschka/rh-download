@@ -9,11 +9,11 @@ import {
     DOWNLOAD_STATE_INITIALIZED,
     DOWNLOAD_STATE_QUEUED,
     DOWNLOAD_STATE_START,
-    DOWNLOAD_STATE_PROGRESS,
     IFile,
     IMessage,
     ITask,
     DOWNLOAD_ACTION_CANCEL,
+    DOWNLOAD_STATE_PROGRESS,
 } from "./api";
 
 export class DownloadManager extends Observable<ITask> {
@@ -112,13 +112,16 @@ export class DownloadManager extends Observable<ITask> {
      */
     public startDownload(task: ITask)
     {
+        const _task: Task = task as Task;
+
+        _task.setState(DOWNLOAD_STATE_QUEUED);
+        this.updateTask(_task);
+        this.taskQueue.push(_task);
+
         this.logService.log(
-            `add download to queue: ${task.getFile().getName()}`,
+            `add download to queue: ${_task.getFile().getName()}`,
             Log.LOG_DEBUG
         );
-
-        this.updateTask(task as Task, DOWNLOAD_STATE_QUEUED);
-        this.taskQueue.push(task);
     }
 
     /**
@@ -139,11 +142,13 @@ export class DownloadManager extends Observable<ITask> {
                 return true;
             });
 
-            this.updateTask(task as Task, DOWNLOAD_STATE_CANCEL, {});
+            (task as Task).setState(DOWNLOAD_STATE_CANCEL);
+            this.updateTask(task as Task);
             return;
         };
 
-        this.processes.get(task).send(DOWNLOAD_ACTION_CANCEL);
+        this.processes.get(task)
+            .send(DOWNLOAD_ACTION_CANCEL);
     }
 
     /**
@@ -189,9 +194,9 @@ export class DownloadManager extends Observable<ITask> {
      * @param {any} [data=null] 
      * @memberof DownloadManager
      */
-    private updateTask(task: Task, state: string, data = null): void {
+    private updateTask(task: Task): void {
 
-        const file: File = task.getFile() as File;
+        const state = task.getState(); 
 
         if (state === DOWNLOAD_STATE_CANCEL ||
             state === DOWNLOAD_STATE_ERROR ||
@@ -201,22 +206,6 @@ export class DownloadManager extends Observable<ITask> {
                 this.processes.get(task).kill("SIGINT");
             }
             this.removeDownload(task);
-        }
-
-        if ( state === DOWNLOAD_STATE_INITIALIZED ) {
-            file.setFileName(data.file.match(/[^\/]+$/)[0] || file.getFileName());
-        }
-
-        data = data || { loaded: 0, size: 0, error: '' };
-
-        file.setLoaded(data.loaded);
-        file.setSize(data.size);
-
-        task.setState(state);
-
-        if ( data.hasError ) {
-            task.setError(data.error.message);
-            this.logService.log(data.error.message, );
         }
 
         task.update();
@@ -247,10 +236,10 @@ export class DownloadManager extends Observable<ITask> {
      */
     private runTask(task: Task, done) {
 
-        const download: IFile = task.getFile();
-        const name = Sanitize.sanitizeFileName(download.getName());
+        const file: IFile = task.getFile();
+        const name        = Sanitize.sanitizeFileName(file.getFileName());
         const params = [
-            "--dir" , download.getDestination(),
+            "--dir" , file.getDestination(),
             "--name", name,
             "--uri" , task.getUri()
         ];
@@ -271,7 +260,8 @@ export class DownloadManager extends Observable<ITask> {
         // send message to child process
         childProcess.send("start");
 
-        this.updateTask(task, DOWNLOAD_STATE_START);
+        task.setState(DOWNLOAD_STATE_START);
+        this.updateTask(task);
     }
 
     /**
@@ -281,19 +271,27 @@ export class DownloadManager extends Observable<ITask> {
      */
     private onTaskMessage(response: IMessage, task: Task) {
 
-        const state = response.state || DOWNLOAD_STATE_ERROR;
-        const data = {
-            hasError : response.hasError,
-            loaded: response.data.loaded || 0,
-            size  : response.data.total  || 0,
-            file  : response.data.file
-        };
+        const file: File = task.getFile() as File;
 
-        if ( response.state !== DOWNLOAD_STATE_PROGRESS ) {
-            this.logService.log(JSON.stringify(response), Log.LOG_DEBUG);
+        if ( response.hasError) {
+            task.setError(response.message.text);
+            task.setState( DOWNLOAD_STATE_ERROR );
+            this.logService.log(response.message.text, Log.LOG_ERROR );
+        } else {
+            file.setLoaded(response.data.loaded);
+            file.setSize(response.data.total);
+
+            if ( response.state === DOWNLOAD_STATE_INITIALIZED ) {
+                file.setFileName(response.data.file.match(/[^\/]+$/)[0] || file.getFileName());
+            }
+
+            if ( response.state !== DOWNLOAD_STATE_PROGRESS ) {
+                this.logService.log( JSON.stringify(response), Log.LOG_DEBUG );
+            }
         }
 
-        this.updateTask(task, state, data);
+        task.setState(response.state);
+        this.updateTask(task);
     }
 
     private createChildProcess(task, param): ChildProcess {
