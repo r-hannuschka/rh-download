@@ -78,8 +78,13 @@ export class DownloadManager extends Observable<ITask> {
         this.processes     = new WeakMap();
     }
 
-    public static getInstance(): DownloadManager {
+    public static getInstance(): DownloadManager 
+    {
         return DownloadManager.instance;
+    }
+
+    public static configure(config)
+    {
     }
 
     /**

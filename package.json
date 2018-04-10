@@ -17,7 +17,7 @@
   "dependencies": {
     "async": "^2.6.0",
     "request": "^2.83.0",
-    "rh-utils": "git+https://git@github.com/r-hannuschka/rh-utils",
+    "rh-utils": "file:../rh-utils",
     "ytdl-core": "^0.20.2"
   },
   "devDependencies": {

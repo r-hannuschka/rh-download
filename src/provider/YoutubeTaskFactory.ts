@@ -36,11 +36,11 @@ export class YoutubeTaskFactory {
     private createFile(data: IYoutubeData): IYoutubeFile
     {
         const file: YoutubeFile = new YoutubeFile();
-        const fileName = ( ! this.configProvider.get('download.keepNameAsFilename') )
+        const fileName = ( ! this.configProvider.get('DownloadModule.keepNameAsFilename') )
             ? this.generateFileName()
             : Sanitize.sanitizeFileName(data.name);
 
-        file.setDestination(this.configProvider.get('download.paths.youtube'));
+        file.setDestination(this.configProvider.get('DownloadModule.paths.ytdl'));
         file.setFileName(fileName);
         file.setImage(data.imageUri);
         file.setName(data.name);
@@ -55,7 +55,7 @@ export class YoutubeTaskFactory {
         let fileName = '';
         let i        = 0;
 
-        const dest   = this.configProvider.get('download.paths.youtube');
+        const dest   = this.configProvider.get('DownloadModule.paths.ytdl');
         const max    = 100;
 
         do {

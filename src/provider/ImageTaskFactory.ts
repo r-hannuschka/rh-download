@@ -38,12 +38,12 @@ export class ImageTaskFactory
     private createFile(data: IFileData): IFile
     {
         const file: File = new File();
-        const fileName = ( ! this.configProvider.get('download.keepNameAsFilename') )
+        const fileName = ( ! this.configProvider.get('DownloadModule.keepNameAsFilename') )
             ? this.generateFileName()
             : Sanitize.sanitizeFileName(data.name);
 
         file.setName(data.name);
-        file.setDestination(data.path  || this.configProvider.get('download.paths.image'));
+        file.setDestination(data.path  || this.configProvider.get('DownloadModule.paths.image'));
         file.setFileName(fileName);
 
         return file;
@@ -55,7 +55,7 @@ export class ImageTaskFactory
         let fileName = '';
         let i        = 0;
 
-        const dest   = this.configProvider.get('download.paths.image');
+        const dest   = this.configProvider.get('DownloadModule.paths.image');
         const max    = 100;
 
         do {
