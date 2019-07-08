@@ -18,7 +18,7 @@
     "async": "^2.6.0",
     "request": "^2.83.0",
     "rh-utils": "git+https://git@github.com/r-hannuschka/rh-utils",
-    "ytdl-core": "^0.20.2"
+    "ytdl-core": "^0.29.0"
   },
   "devDependencies": {
     "@types/node": "^9.4.7",
